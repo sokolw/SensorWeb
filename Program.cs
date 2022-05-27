@@ -4,20 +4,25 @@ using SensorWeb.Sensor.DataAccess.Repository;
 using SensorWeb.Sensor.DataAccess.Repository.IRepository;
 using SensorWeb.Sensor.DataAccess.RequestAPI;
 using SensorWeb.Sensor.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-// удобный сервис дл€ динамической компл€ции разор страниц
+// useful service for dynamically compile RazorPages
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
-// тож в DI
+// use DI
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));
-// делаем DI зависимость
-builder.Services.AddScoped<ISensorModelRepository, SensorModelRepository>(); // подключаем парттерн Repository 
-// сервис дл€ получени€ данных по апи
+// identity autogen
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+// identity autogen
+// use DI
+builder.Services.AddScoped<ISensorModelRepository, SensorModelRepository>(); // use in service pattern-Repository 
+// add service to access API
 builder.Services.AddScoped<DataFromAPI>();
 
 var app = builder.Build();
@@ -35,8 +40,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Authentication always use before Authorization, else not work
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
