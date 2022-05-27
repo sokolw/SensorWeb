@@ -39,8 +39,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication();;
 
+// Authentication always use before Authorization, else not work
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
