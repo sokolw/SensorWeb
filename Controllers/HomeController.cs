@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using SensorWeb.Sensor.Data;
-using SensorWeb.Sensor.DataAccess.Repository;
 using SensorWeb.Sensor.DataAccess.Repository.IRepository;
 using SensorWeb.Sensor.DataAccess.RequestAPI;
 using SensorWeb.Sensor.Models;
