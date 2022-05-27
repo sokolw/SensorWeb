@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SensorWeb.Sensor.Data;
 
@@ -11,14 +12,17 @@ using SensorWeb.Sensor.Data;
 namespace SensorWeb.Sensor.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220527122137_addIdentityDb")]
+    partial class addIdentityDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -225,7 +229,10 @@ namespace SensorWeb.Sensor.DataAccess.Migrations
             modelBuilder.Entity("SensorWeb.Sensor.Models.SensorModel", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -247,6 +254,8 @@ namespace SensorWeb.Sensor.DataAccess.Migrations
 
                     b.Property<int>("Сharge")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Sensors");
                 });
