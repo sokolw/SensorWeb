@@ -11,5 +11,8 @@ namespace SensorWeb.Sensor.Data
         }
 
         public DbSet<SensorModel> Sensors { get; set; }
+
+        // blocking User from Identity
+        public new DbSet<User> Users { get; set; }
     }
 }
