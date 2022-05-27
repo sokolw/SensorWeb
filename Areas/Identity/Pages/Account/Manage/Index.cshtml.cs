@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SensorWeb.Sensor.Data;
+using SensorWeb.Sensor.Models;
 
 namespace SensorWeb.Areas.Identity.Pages.Account.Manage
 {
@@ -16,13 +18,16 @@ namespace SensorWeb.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ApplicationDbContext _applicationDbContext;
 
         public IndexModel(
             UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<IdentityUser> signInManager,
+            ApplicationDbContext applicationDbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _applicationDbContext = applicationDbContext;
         }
 
         /// <summary>
@@ -58,18 +63,35 @@ namespace SensorWeb.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Required]
+            [Display(Name = "Name")]
+            public string Name { get; set; }
+
+            [Required]
+            [Display(Name = "LastName")]
+            public string LastName { get; set; }
+
+            [Required]
+            [Display(Name = "PassportID")]
+            public string PassportID { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
         {
+            var userId = await _userManager.GetUserIdAsync(user);
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
+            User dataUser = _applicationDbContext.Users.Find(userId);
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Name = dataUser != null ? dataUser.Name : "not find",
+                LastName = dataUser != null ? dataUser.LastName : "not find",
+                PassportID = dataUser != null ? dataUser.PassportID : "not find",
             };
         }
 
@@ -100,6 +122,28 @@ namespace SensorWeb.Areas.Identity.Pages.Account.Manage
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            var userId = await _userManager.GetUserIdAsync(user);
+            User dataUser = _applicationDbContext.Users.Find(userId);
+
+            if (dataUser != null)
+            {
+                if (Input.Name != dataUser.Name)
+                {
+                    dataUser.Name = Input.Name;
+                }
+                if (Input.LastName != dataUser.LastName)
+                {
+                    dataUser.LastName = Input.LastName;
+                }
+                if (Input.PassportID != dataUser.PassportID)
+                {
+                    dataUser.PassportID = Input.PassportID;
+                }
+
+                _applicationDbContext.Users.Update(dataUser);
+                _applicationDbContext.SaveChanges();
+            }
+
             if (Input.PhoneNumber != phoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
