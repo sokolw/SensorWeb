@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model IEnumerable<SensorModel>
+
+<div class="text-center">
+    <h1 class="display-4">SensorModel</h1>
+</div>
+
+<form method="post" asp-action="Index">
+    <input type="submit" value="Получить данные" />
+</form>
+
+<div>Sensors в БД</div>
+@if (Model != null)
+{
+    @foreach (var Sensor in Model)
+    {
+        <div>Id: @Sensor.Id</div>
+        <div>Name: @Sensor.Name</div>
+        <div>OwnerName: @Sensor.OwnerName</div>
+        <div>GPS: @Sensor.GPS</div>
+        <div>Glonass: @Sensor.Glonass</div>
+        <div>Сharge: @Sensor.Сharge</div>
+        <div>Indication: @Sensor.Indication</div>
+        <div>Date: @Sensor.Date</div>
+        <hr />
+    }
+}
