@@ -5,23 +5,30 @@ using SensorWeb.Sensor.DataAccess.Repository.IRepository;
 using SensorWeb.Sensor.DataAccess.RequestAPI;
 using SensorWeb.Sensor.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SpaServices.Extensions;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 // useful service for dynamically compile RazorPages
-builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+// builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+
 // use DI
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+
 // identity autogen
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 // identity autogen
+
 // use DI
-builder.Services.AddScoped<ISensorModelRepository, SensorModelRepository>(); // use in service pattern-Repository 
+builder.Services.AddScoped<ISensorModelRepository, SensorModelRepository>(); // use in service pattern-Repository
+
 // add service to access API
 builder.Services.AddScoped<DataFromAPI>();
 
@@ -37,16 +44,18 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
 // Authentication always use before Authorization, else not work
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
+//app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// This is convenient for routing requests for dynamic content to a SPA framework
+app.MapFallbackToFile("index.html");
 
 app.Run();
